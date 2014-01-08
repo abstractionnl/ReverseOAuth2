@@ -7,7 +7,7 @@ use Zend\Http\PhpEnvironment\Request;
 
 class LinkedIn extends AbstractOAuth2Client
 {
-    
+
     protected $providerName = 'linkedin';
 
     public function getUrl()
@@ -20,9 +20,9 @@ class LinkedIn extends AbstractOAuth2Client
             . $this->getScope(' ');
 
         return $url;
-        
+
     }
-    
+
     public function getToken(Request $request)
     {
         if(isset($this->session->token)) {
@@ -48,6 +48,7 @@ class LinkedIn extends AbstractOAuth2Client
                 $token = \Zend\Json\Decoder::decode($retVal);
                 if(isset($token->access_token) AND $token->expires_in > 0) {
                     $this->session->token = $token;
+                    $this->session->setExpirationSeconds( $token->expires_in );
                     return true;
                 } else {
                     $this->error  = array(
@@ -65,8 +66,8 @@ class LinkedIn extends AbstractOAuth2Client
         } else {
             $this->error = array(
                 'internal-error'=> 'State error, request variables do not match the session variables.',
-                'session-state' => $this->session->state, 
-                'request-state' => $request->getQuery('state'), 
+                'session-state' => $this->session->state,
+                'request-state' => $request->getQuery('state'),
                 'code'          => $request->getQuery('code')
             );
             return false;
